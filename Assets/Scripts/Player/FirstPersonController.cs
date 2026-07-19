@@ -114,7 +114,7 @@ public class FirstPersonController : MonoBehaviour
 
     public void PerformInteractionCheck()
     {
-        if (playerCamera == null || controlsLocked) return;
+        if (playerCamera == null || controlsLocked || inventoryPanel.activeSelf) return;
 
         // Create a ray from the camera's position in the direction it's facing
         Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
