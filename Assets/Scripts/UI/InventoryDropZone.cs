@@ -16,6 +16,19 @@ public class InventoryDropZone : MonoBehaviour, IDropHandler
     {
         if (eventData.pointerDrag != null && eventData.pointerDrag.TryGetComponent(out UIDraggableItem draggedItemUI))
         {
+            if (playerHand == null || !playerHand.IsHandOccupied)
+            {
+                Debug.LogWarning("Cannot stow item: Player hands are empty!");
+                return;
+            }
+
+            // Verify if the linked physical item matches the physical item in hand
+            if (draggedItemUI.LinkedPhysicalItem != playerHand.CurrentlyHeldItem)
+            {
+                Debug.Log("This item is already stowed or doesn't match the item in your hand.");
+                return;
+            }
+
             ActiveItem physicalItem = playerHand.ClearHandSlot();
 
             if (physicalItem != null)

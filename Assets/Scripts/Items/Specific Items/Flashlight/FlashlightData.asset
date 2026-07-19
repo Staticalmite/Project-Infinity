@@ -14,4 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Flashlight
   itemDescription: Lights The Way.
-  itemIcon: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  itemIcon: {fileID: 1500422252, guid: edd449d6522ada848a716feed262de29, type: 3}
+  physicalPrefab: {fileID: 5674988240029702888, guid: daa396f2fc3f94b45b2a9884355d1254, type: 3}

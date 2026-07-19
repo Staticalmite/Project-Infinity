@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
@@ -31,6 +32,9 @@ public class FirstPersonController : MonoBehaviour
     private float verticalRotation = 0f;
     public bool controlsLocked = false;
 
+    [Header("Inventory Settings")]
+    [SerializeField] private GameObject inventoryPanel;
+
     void Awake()
     {
         characterController = GetComponent<CharacterController>();
@@ -46,6 +50,8 @@ public class FirstPersonController : MonoBehaviour
         {
             playerCamera.fieldOfView = normalFOV;
         }
+
+        inventoryPanel.SetActive(false);
     }
 
     void Update()
@@ -110,14 +116,44 @@ public class FirstPersonController : MonoBehaviour
     {
         if (playerCamera == null || controlsLocked) return;
 
+        // Create a ray from the camera's position in the direction it's facing
         Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
         Debug.DrawRay(playerCamera.transform.position, playerCamera.transform.forward * interactionDistance, Color.red, 10f);
+
+        // Perform the raycast and check if it hits an object on the interactable layer
         if (Physics.Raycast(ray, out RaycastHit hit, interactionDistance, interactableLayer))
         {
+            // Check if the hit object has a component that implements IInteractable, if so, call its Interact method.
             if (hit.collider.TryGetComponent(out IInteractable interactable))
             {
                 interactable.Interact(inputProvider);
             }
+        }
+    }
+
+    internal void toggleInventory()
+    {
+        // Toggle the panel visibility
+        inventoryPanel.SetActive(!inventoryPanel.activeSelf);
+
+        // Base cursor settings on whether the inventory panel is now open
+        if (inventoryPanel.activeSelf)
+        {
+            // Inventory is OPEN: Free the cursor so the player can drag and drop
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+
+            // Stop movement
+            controlsLocked = true;
+        }
+        else
+        {
+            // Inventory is CLOSED: Lock the cursor back to the screen center for playing
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+
+            // Unlock gameplay controls
+               controlsLocked = false;
         }
     }
 }

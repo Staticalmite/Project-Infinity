@@ -36,6 +36,7 @@ public class PlayerControls : MonoBehaviour
 
         playerActions.Player.Interact.performed += Handle_Interact;
         playerActions.Player.HandAction.performed += Handle_HandAction;
+        playerActions.Player.ToggleInventory.performed += Handle_InventoryToggle;
 
     }
 
@@ -60,5 +61,10 @@ public class PlayerControls : MonoBehaviour
     private void Handle_Interact(InputAction.CallbackContext context)
     {
         firstPersonController.PerformInteractionCheck();
+    }
+
+    private void Handle_InventoryToggle(InputAction.CallbackContext context)
+    {
+        firstPersonController.toggleInventory();
     }
 }
