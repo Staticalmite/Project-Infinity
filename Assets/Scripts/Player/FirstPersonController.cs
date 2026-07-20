@@ -35,6 +35,10 @@ public class FirstPersonController : MonoBehaviour
     [Header("Inventory Settings")]
     [SerializeField] private GameObject inventoryPanel;
 
+    private IFocusable activeFocusable;
+
+    public GameObject InventoryPanel => inventoryPanel;
+
     void Awake()
     {
         characterController = GetComponent<CharacterController>();
@@ -56,6 +60,15 @@ public class FirstPersonController : MonoBehaviour
 
     void Update()
     {
+        // If we are currently focusing an object, pass along the look input to it for interaction.
+        if (activeFocusable != null)
+        {
+            // Pass mouse Y movement (or stick Y) to the object
+            Vector2 look = inputProvider.LookInput;
+            activeFocusable.OnUpdateInteraction(look.y);
+        }
+
+        // Only run normal movement if not focusing
         if (controlsLocked) return;
 
         HandleRotation();
@@ -114,14 +127,22 @@ public class FirstPersonController : MonoBehaviour
 
     public void PerformInteractionCheck()
     {
-        if (playerCamera == null || controlsLocked || inventoryPanel.activeSelf) return;
+        if (playerCamera == null || controlsLocked) return;
 
         // Create a ray from the camera's position in the direction it's facing
         Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
         Debug.DrawRay(playerCamera.transform.position, playerCamera.transform.forward * interactionDistance, Color.red, 10f);
 
-        // Perform the raycast and check if it hits an object on the interactable layer
-        if (Physics.Raycast(ray, out RaycastHit hit, interactionDistance, interactableLayer))
+        // Perform the raycast and check if it hits an object on the interactable 
+        if (Physics.Raycast(ray, out RaycastHit hit, interactionDistance, interactableLayer) && hit.collider.TryGetComponent(out IFocusable focusable))
+        {
+            // It's a focusable interactable, so we call its OnFocus method.
+            focusable.OnFocus(inputProvider);
+            activeFocusable = focusable;
+            controlsLocked = true;
+            Debug.Log("Focus Attempted");
+        }
+        else if (Physics.Raycast(ray, out hit, interactionDistance, interactableLayer))
         {
             // Check if the hit object has a component that implements IInteractable, if so, call its Interact method.
             if (hit.collider.TryGetComponent(out IInteractable interactable))

@@ -8,6 +8,13 @@ public class PlayerHand : MonoBehaviour
     public ActiveItem CurrentlyHeldItem { get; private set; }
     public bool IsHandOccupied => CurrentlyHeldItem != null;
 
+    private FirstPersonController firstPersonController;
+
+    private void Awake()
+    {
+        firstPersonController = GetComponent<FirstPersonController>();
+    }
+
     public bool TryEquipItem(ActiveItem newItem)
     {
         if (IsHandOccupied) return false;
@@ -39,9 +46,11 @@ public class PlayerHand : MonoBehaviour
         return itemLeavingHand;
     }
 
+
+    // ADD TO THIS: IF INVENTORY IS OPEN, THEN PREVENT HAND ACTIONS
     public void ExecuteHandAction()
     {
-        if (IsHandOccupied)
+        if (IsHandOccupied && (firstPersonController == null || !firstPersonController.InventoryPanel.activeSelf))
         {
             CurrentlyHeldItem.OnUseAction();
         }

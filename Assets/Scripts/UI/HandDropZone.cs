@@ -35,6 +35,8 @@ public class HandDropZone : MonoBehaviour, IDropHandler
                 // Try to pass it into the player's hands.
                 if (playerHand.TryEquipItem(activeItemComponent))
                 {
+                    draggedItemUI.SetLinkedPhysicalItem(activeItemComponent);
+
                     // Remove the item from the inventory.
                     playerInventory.RemoveItem(itemToEquip);
                     draggedItemUI.OnReturnedToHand(transform);

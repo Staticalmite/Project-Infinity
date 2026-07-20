@@ -18,6 +18,12 @@ public class UIDraggableItem : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     // Read-only ItemData property to expose the currently held item data for external access
     public ItemData CurrentItemData {  get; private set; }
 
+    // Public method to set the linked physical item, allowing external scripts to establish the connection
+    public void SetLinkedPhysicalItem(ActiveItem item)
+    {
+        LinkedPhysicalItem = item;
+    }
+
     // Read-only property to expose the linked physical item for external access
     public ActiveItem LinkedPhysicalItem { get; private set; }
 
