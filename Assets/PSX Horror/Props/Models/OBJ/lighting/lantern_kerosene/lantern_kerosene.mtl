@@ -1,0 +1,17 @@
+newmtl lantern_kerosene_mat
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+map_Kd lantern_kerosene.png
+
+newmtl lantern_kerosene_glow
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+Ke 1 1 1
+d 1
+illum 1
+map_Kd lantern_kerosene.png
+map_Ke lantern_kerosene.png

@@ -1,0 +1,17 @@
+newmtl fluorescent_fixture_mat
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+map_Kd fluorescent_fixture.png
+
+newmtl fluorescent_fixture_glow
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+Ke 1 1 1
+d 1
+illum 1
+map_Kd fluorescent_fixture.png
+map_Ke fluorescent_fixture.png

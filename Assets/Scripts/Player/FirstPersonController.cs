@@ -32,6 +32,8 @@ public class FirstPersonController : MonoBehaviour
     private float verticalRotation = 0f;
     public bool controlsLocked = false;
 
+    public bool makingNoise = false;
+
     [Header("Inventory Settings")]
     [SerializeField] private GameObject inventoryPanel;
 
@@ -98,6 +100,15 @@ public class FirstPersonController : MonoBehaviour
 
         movement.y = velocity.y;
         characterController.Move(movement * Time.deltaTime);
+
+        if(movement.x != 0)
+        {
+            makingNoise = true;
+        }
+        else
+        {
+            makingNoise = false;
+        }
     }
 
     private void HandleRotation()

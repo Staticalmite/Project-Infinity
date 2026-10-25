@@ -1,0 +1,17 @@
+newmtl vending_machine_mat
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+map_Kd vending_machine.png
+
+newmtl vending_machine_glow
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+Ke 1 1 1
+d 1
+illum 1
+map_Kd vending_machine.png
+map_Ke vending_machine.png

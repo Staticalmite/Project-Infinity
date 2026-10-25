@@ -1,0 +1,17 @@
+newmtl bulb_hanging_mat
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+map_Kd bulb_hanging.png
+
+newmtl bulb_hanging_glow
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+Ke 1 1 1
+d 1
+illum 1
+map_Kd bulb_hanging.png
+map_Ke bulb_hanging.png

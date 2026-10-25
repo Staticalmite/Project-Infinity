@@ -1,0 +1,17 @@
+newmtl lamp_desk_mat
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+map_Kd lamp_desk.png
+
+newmtl lamp_desk_glow
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+Ke 1 1 1
+d 1
+illum 1
+map_Kd lamp_desk.png
+map_Ke lamp_desk.png

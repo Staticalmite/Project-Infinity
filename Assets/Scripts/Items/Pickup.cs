@@ -29,7 +29,7 @@ public class Pickup : MonoBehaviour, IInteractable
             if (hand.TryEquipItem(itemComponent))
             {
                 playerController.toggleInventory();
-                // Find the Hand UI Slot in the scene dynamically
+                // Find the Hand UI Slot in the scene
                 HandDropZone handDropZone = FindFirstObjectByType<HandDropZone>();
 
                 if (handDropZone != null)
@@ -37,13 +37,15 @@ public class Pickup : MonoBehaviour, IInteractable
                     // Spawn the UI Prefab as a child of the Hand UI Slot
                     GameObject spawnedUI = Instantiate(uiItemPrefab, handDropZone.transform);
 
-                    // Pass the data directly into the exact UIDraggableItem script
+                    // Pass the data directly into the UIDraggableItem script
                     if (spawnedUI.TryGetComponent(out UIDraggableItem draggable))
                     {
                         draggable.InitializeFromPickup(itemComponent.Data, itemComponent);
                     }
-                    playerController.toggleInventory();
                 }
+                // Close the inventory panel. This should be done quickly so the player doesn't see the inventory open and close again.
+                // Maybe consider changing this to involve a solution that doesn't involve toggling the inventory state.
+                playerController.toggleInventory();
 
                 Debug.Log($"Picked up {itemComponent.Data.itemName} into hands and instantiated UI.");
             }

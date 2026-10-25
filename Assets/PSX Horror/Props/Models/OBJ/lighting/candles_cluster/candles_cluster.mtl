@@ -1,0 +1,19 @@
+newmtl candles_cluster_mat
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+map_Kd candles_cluster.png
+map_d candles_cluster.png
+
+newmtl candles_cluster_glow
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+Ke 1 1 1
+d 1
+illum 1
+map_Kd candles_cluster.png
+map_Ke candles_cluster.png
+map_d candles_cluster.png

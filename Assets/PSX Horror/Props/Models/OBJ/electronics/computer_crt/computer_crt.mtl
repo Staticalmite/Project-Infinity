@@ -1,0 +1,17 @@
+newmtl computer_crt_mat
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+map_Kd computer_crt.png
+
+newmtl computer_crt_glow
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+Ke 1 1 1
+d 1
+illum 1
+map_Kd computer_crt.png
+map_Ke computer_crt.png

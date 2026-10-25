@@ -1,0 +1,17 @@
+newmtl road_barrier_mat
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+map_Kd road_barrier.png
+
+newmtl road_barrier_glow
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+Ke 1 1 1
+d 1
+illum 1
+map_Kd road_barrier.png
+map_Ke road_barrier.png

@@ -21,7 +21,7 @@ public class PlayerHand : MonoBehaviour
 
         CurrentlyHeldItem = newItem;
 
-        // Reparent the 3D item to your camera's hand slot anchor location
+        // Reparent the 3D item to the camera's hand slot anchor location
         Transform itemTransform = CurrentlyHeldItem.transform;
         itemTransform.SetParent(handSlotAnchor);
         itemTransform.localPosition = Vector3.zero;
@@ -31,6 +31,7 @@ public class PlayerHand : MonoBehaviour
         if (CurrentlyHeldItem.TryGetComponent(out Rigidbody rb)) rb.isKinematic = true;
         if (CurrentlyHeldItem.TryGetComponent(out Collider col)) col.enabled = false;
 
+        // Trigger the item's OnEquip behavior
         CurrentlyHeldItem.OnEquip();
         return true;
     }

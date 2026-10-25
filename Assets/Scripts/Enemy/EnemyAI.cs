@@ -1,3 +1,4 @@
+using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
@@ -12,18 +13,36 @@ public class EnemyAI : MonoBehaviour
 
     private EnemyState currentState = EnemyState.Patrolling;
     private Transform player;
+    private FirstPersonController firstPersonController;
 
     private NavMeshAgent agent;
     [SerializeField] private Waypoint currentWaypoint;
 
     [Header("DetectionSettings")]
-    [SerializeField] private float detectionRange = 5f;
-    [SerializeField] private float loseSightRange = 8f; // Slightly larger to prevent jittering
+    [SerializeField] private float detectionRange;
+    [SerializeField] private float loseSightRange;
 
-    void Start()
+    private LayerMask layerMask;
+    private RaycastHit hit;
+    private EnemyAudioManager audioManager;
+
+
+    public AudioSource audioSource;
+
+
+    private Animator animator; 
+
+    void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
-        player = FindFirstObjectByType<FirstPersonController>().transform;
+        firstPersonController = FindFirstObjectByType<FirstPersonController>();
+        player = firstPersonController.transform;
+        audioSource = GetComponent<AudioSource>();
+        audioManager = FindFirstObjectByType<EnemyAudioManager>();
+        animator = GetComponent<Animator>();
+
+
+        layerMask = LayerMask.GetMask("Wall", "Player");
 
         // Make sure a waypoint was assigned in the inspector
         if (currentWaypoint != null)
@@ -69,11 +88,20 @@ public class EnemyAI : MonoBehaviour
     // State Logic 
     private void UpdatePatrolState()
     {
-        // Check for transition to Chasing
-        if (player != null && Vector3.Distance(transform.position, player.position) <= detectionRange)
+        Debug.DrawRay(transform.position, (firstPersonController.transform.position - transform.position).normalized * detectionRange, Color.blue, 0.1f);
+        // Check for transition to Chasing - if the player is making noise and in sight, switch to Chasing.
+        if (firstPersonController != null && firstPersonController.makingNoise && Physics.Raycast(transform.position, player.position - transform.position, out hit, detectionRange, layerMask))
         {
-            currentState = EnemyState.Chasing;
-            return; // Exit the method immediately so patrol logic doesn't run
+            if(hit.collider.CompareTag("Player"))
+            {
+                print(hit);
+                currentState = EnemyState.Chasing;
+                animator.SetBool("isChasing", true);
+                // To get the right length for the delay - delay should be the length of the animation divided by the speed of the animation.
+                // For example, if the animation is 1.208 seconds, then the delay should be 1.208 / 0.5 = 2.416 seconds.
+                StartCoroutine(StartChaseRoutine(2.416f));
+                return; // Exit the method immediately so patrol logic doesn't run
+            }
         }
 
         // Standard Patrol Logic
@@ -112,5 +140,19 @@ public class EnemyAI : MonoBehaviour
 
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, loseSightRange);
+    }
+
+    private IEnumerator StartChaseRoutine(float delay)
+    {
+        // Stop the enemy immediately & play the scream audio.
+        agent.speed = 0;
+        audioManager.PlayScream();
+
+        // Wait for the specified delay
+        yield return new WaitForSeconds(delay);
+
+        // Speed the enemy back up and play the chase audio.
+        audioManager.PlayChaseAudio();
+        agent.speed = 4;
     }
 }

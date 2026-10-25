@@ -1,0 +1,17 @@
+newmtl vcr_player_mat
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+map_Kd vcr_player.png
+
+newmtl vcr_player_glow
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+Ke 1 1 1
+d 1
+illum 1
+map_Kd vcr_player.png
+map_Ke vcr_player.png
