@@ -144,7 +144,7 @@ public class FirstPersonController : MonoBehaviour
         Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
         Debug.DrawRay(playerCamera.transform.position, playerCamera.transform.forward * interactionDistance, Color.red, 10f);
 
-        // Perform the raycast and check if it hits an object on the interactable 
+        // Perform the raycast and check if it hits an object on the interactable layer within the specified interaction distance. If it does, check if the hit object has a component that implements IFocusable. If so, call its OnFocus method.
         if (Physics.Raycast(ray, out RaycastHit hit, interactionDistance, interactableLayer) && hit.collider.TryGetComponent(out IFocusable focusable))
         {
             // It's a focusable interactable, so we call its OnFocus method.
@@ -156,6 +156,7 @@ public class FirstPersonController : MonoBehaviour
         else if (Physics.Raycast(ray, out hit, interactionDistance, interactableLayer))
         {
             // Check if the hit object has a component that implements IInteractable, if so, call its Interact method.
+            // To check the interact method for pickup items, check the Pickup script within the Items folder in Scripts.
             if (hit.collider.TryGetComponent(out IInteractable interactable))
             {
                 interactable.Interact(inputProvider);

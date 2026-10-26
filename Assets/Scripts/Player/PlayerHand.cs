@@ -15,6 +15,7 @@ public class PlayerHand : MonoBehaviour
         firstPersonController = GetComponent<FirstPersonController>();
     }
 
+    // Responsible for equipping an item to the player's hand slot. Returns true if successful, false if the hand is already occupied.
     public bool TryEquipItem(ActiveItem newItem)
     {
         if (IsHandOccupied) return false;
@@ -42,6 +43,17 @@ public class PlayerHand : MonoBehaviour
 
         ActiveItem itemLeavingHand = CurrentlyHeldItem;
         itemLeavingHand.OnUnequip();
+
+        CurrentlyHeldItem = null;
+        return itemLeavingHand;
+    }
+
+    public ActiveItem DropItem()
+    {
+        if (!IsHandOccupied) return null;
+
+        ActiveItem itemLeavingHand = CurrentlyHeldItem;
+        itemLeavingHand.OnDrop();
 
         CurrentlyHeldItem = null;
         return itemLeavingHand;

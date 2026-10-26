@@ -12,6 +12,9 @@ public abstract class ActiveItem : MonoBehaviour
     public ItemData Data => data;
     public Vector3 TargetHandRotation => targetHandRotation;
 
+    protected Rigidbody rb;
+    protected Collider col;
+
     // Abstract methods that must be implemented by subclasses, anything using this class must implement these methods.
 
     // <summary> What happens when the item is used</summary>
@@ -23,5 +26,19 @@ public abstract class ActiveItem : MonoBehaviour
     // <summary> What happens when the item is unequipped</summary>
     public abstract void OnUnequip();
 
+    // <summary> What happens when the item is dropped</summary>
+    public abstract void OnDrop();
+
+    // Base Awake handles component caching automatically for the rigidbody and collider, so subclasses don't have to worry about it.
+    protected virtual void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+        col = GetComponent<Collider>();
+
+        if (rb == null)
+            Debug.LogWarning($"{gameObject.name}: ActiveItem is missing a Rigidbody.", this);
+        if (col == null)
+            Debug.LogWarning($"{gameObject.name}: ActiveItem is missing a Collider.", this);
+    }
 
 }
