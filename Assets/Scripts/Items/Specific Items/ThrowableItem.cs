@@ -44,6 +44,17 @@ public class ThrowableItem : ActiveItem
             if (shatterPrefab != null)
             {
                 Instantiate(shatterPrefab, transform.position, Quaternion.identity);
+            };
+
+            if(collision.gameObject.CompareTag("Enemy"))
+            {
+                print("Collided with Enemy");
+                // If the item collides with an enemy, apply damage to the enemy.
+                EnemyAI enemyAI = collision.gameObject.GetComponent<EnemyAI>();
+                if (enemyAI != null)
+                {
+                    enemyAI.Stun(10f); // Adjust damage value as needed.
+                }
             }
             // Destroy this item after it has collided.
             Destroy(this.gameObject);

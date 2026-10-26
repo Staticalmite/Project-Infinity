@@ -26,4 +26,10 @@ public class EnemyAudioManager : MonoBehaviour
         enemyAudioSource.clip = screamAudioClip;
         enemyAudioSource.Play();
     }
+
+    public void PlayScreamOneShot()
+    {
+        // PlayOneShot allows the scream to play without replacing the main clip
+        enemyAudioSource.PlayOneShot(screamAudioClip);
+    }
 }

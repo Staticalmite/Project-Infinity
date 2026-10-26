@@ -1,4 +1,5 @@
 using System.Collections;
+using System.ComponentModel.Design;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
@@ -30,7 +31,10 @@ public class EnemyAI : MonoBehaviour
     public AudioSource audioSource;
 
 
-    private Animator animator; 
+    private Animator animator;
+
+    // Adjust this value based on the length of the scream animation and its speed. First number is the speed, second is the speed.
+    private float screamDelay = 1.208f / 0.5f;
 
     void Awake()
     {
@@ -97,9 +101,7 @@ public class EnemyAI : MonoBehaviour
                 print(hit);
                 currentState = EnemyState.Chasing;
                 animator.SetBool("isChasing", true);
-                // To get the right length for the delay - delay should be the length of the animation divided by the speed of the animation.
-                // For example, if the animation is 1.208 seconds, then the delay should be 1.208 / 0.5 = 2.416 seconds.
-                StartCoroutine(StartChaseRoutine(2.416f));
+                StartCoroutine(StartChaseRoutine(screamDelay));
                 return; // Exit the method immediately so patrol logic doesn't run
             }
         }
@@ -132,6 +134,28 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            // Handle player collision logic here
+            Debug.Log("Player has been caught by the enemy!");
+            // add logic for what happens when the player is caught, being reset to the start of the current task.
+        }
+    }
+
+    public void Stun(float stunDuration)
+    {
+        // Handle logic for being stunned by the player, including for a normal stun and a counter stun.
+        // This should include stopping the enemy, playing a stunned animation, and then resuming the previous state after a delay.
+        agent.isStopped = true;
+        animator.SetBool("isStunned", true);
+        animator.SetBool("isChasing", false);
+
+        // If the enemy is stunned and wasn't previously chasing, enter chase with the player as the target after a delay.
+        StartCoroutine(StartChaseAfterStunRoutine(stunDuration));
+    }
+
     // Visual aid for tuning the detection ranges in the editor
     private void OnDrawGizmosSelected()
     {
@@ -142,17 +166,47 @@ public class EnemyAI : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, loseSightRange);
     }
 
+    // Coroutine to handle the delay before starting the chase
+    // Specifically makes sure the enemy stops moving, plays the scream audio, waits for the animation delay, then resumes chasing.
     private IEnumerator StartChaseRoutine(float delay)
     {
         // Stop the enemy immediately & play the scream audio.
-        agent.speed = 0;
+        agent.isStopped = true;
         audioManager.PlayScream();
 
         // Wait for the specified delay
         yield return new WaitForSeconds(delay);
 
-        // Speed the enemy back up and play the chase audio.
-        audioManager.PlayChaseAudio();
+        // Resume the enemy, speed itup and play the chase audio.
+        agent.isStopped = false;
         agent.speed = 4;
+        audioManager.PlayChaseAudio();
+    }
+
+    // Coroutine to handle the delay before starting the chase after being stunned
+    private IEnumerator StartChaseAfterStunRoutine(float delay)
+    {
+        // Wait for the specified delay
+        yield return new WaitForSeconds(delay);
+        // Play the scream audio after the stun delay and start the scream delay.
+        // If we're already chasing, instantiate the scream audio as to not interrupt the chase audio.
+        if (currentState != EnemyState.Chasing)
+        {
+            audioManager.PlayScream();
+        }
+        else
+        {
+            audioManager.PlayScreamOneShot();
+        }
+            animator.SetBool("isStunned", false);
+        animator.SetBool("isChasing", true);
+        yield return new WaitForSeconds(screamDelay);
+        // Resume the enemy, speed it up and play the chase audio.
+        agent.isStopped = false;
+        agent.speed = 4;
+        // Only play the chase audio if we're not already chasing, to avoid overlapping audio.
+        if (currentState != EnemyState.Chasing)
+            audioManager.PlayChaseAudio();
+        currentState = EnemyState.Chasing;
     }
 }
