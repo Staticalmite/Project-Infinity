@@ -130,6 +130,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   data: {fileID: 11400000, guid: 66170fea808f246409007809533ed4a2, type: 2}
   targetHandRotation: {x: 0, y: 0, z: 0}
+  linkedUIItem: {fileID: 0}
   shatterPrefab: {fileID: 5323353047089833919, guid: 0855f3c41ad01c64b842fc140652a669, type: 3}
 --- !u!114 &7252229266513137208
 MonoBehaviour:

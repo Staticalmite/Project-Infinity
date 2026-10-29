@@ -8,7 +8,7 @@ public abstract class ActiveItem : MonoBehaviour
     [Header("Hand Placement Configuration")]
     [Tooltip("The Euler angle rotation this item needs to face forward properly")]
     [SerializeField] private Vector3 targetHandRotation;
-    private UIDraggableItem linkedUIItem;
+    [SerializeField] private UIDraggableItem linkedUIItem;
 
     // Read-only property to safely access the needed info from other scripts
     public ItemData Data => data;

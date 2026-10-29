@@ -24,28 +24,21 @@ public class HandDropZone : MonoBehaviour, IDropHandler
                 return;
             }
             // Retrieve the item data from the inventory
-            ItemData itemToEquip = draggedItemUI.CurrentItemData;
+            ItemData itemToEquipData = draggedItemUI.CurrentItemData;
+            ActiveItem itemToEquip = draggedItemUI.LinkedPhysicalItem;
 
-            if (itemToEquip != null && itemToEquip.physicalPrefab != null)
+            if (itemToEquip != null)
             {
-                // Re-instantiate the Object
-                GameObject newPhysicalObject = Instantiate(itemToEquip.physicalPrefab);
-                ActiveItem activeItemComponent = newPhysicalObject.GetComponent<ActiveItem>();
-
                 // Try to pass it into the player's hands.
-                if (playerHand.TryEquipItem(activeItemComponent))
+                if (playerHand.TryEquipItem(itemToEquip))
                 {
-                    draggedItemUI.SetLinkedPhysicalItem(activeItemComponent);
+                    draggedItemUI.SetLinkedPhysicalItem(itemToEquip);
 
                     // Remove the item from the inventory.
-                    playerInventory.RemoveItem(itemToEquip);
+                    playerInventory.RemoveItem(itemToEquipData);
                     draggedItemUI.OnReturnedToHand(transform);
                 }
-                else
-                {
-                    // Clean it up if it failed for any reason.
-                    Destroy(newPhysicalObject);
-                }
+                
             }
 
         }
