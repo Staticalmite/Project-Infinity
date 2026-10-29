@@ -35242,6 +35242,7 @@ Transform:
   m_Children:
   - {fileID: 913508748}
   - {fileID: 256364700}
+  - {fileID: 1296128389}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1215586645
@@ -37754,7 +37755,7 @@ GameObject:
   - component: {fileID: 1296128387}
   - component: {fileID: 1296128386}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: Inventory
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -37836,7 +37837,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 726665971}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1215586644}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -62096,7 +62097,6 @@ SceneRoots:
   - {fileID: 1047748923}
   - {fileID: 795968590}
   - {fileID: 2771969514195127435}
-  - {fileID: 1296128389}
   - {fileID: 1034735978}
   - {fileID: 1123567907984147599}
   - {fileID: 1239436499}
