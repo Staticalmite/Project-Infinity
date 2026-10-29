@@ -15,13 +15,6 @@ public class ThrowableItem : ActiveItem
 
     public override void OnEquip() => gameObject.SetActive(true);
     public override void OnUnequip() => gameObject.SetActive(false);
-    public override void OnDrop()
-    {
-        gameObject.SetActive(true);
-        transform.SetParent(null);
-        rb.isKinematic = false;
-        col.enabled = true;
-    }
     public override void OnUseAction()
     {
         // Call the drop method to detach the item from the player's hand and enable physics.

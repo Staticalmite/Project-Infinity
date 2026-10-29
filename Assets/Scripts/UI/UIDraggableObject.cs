@@ -34,6 +34,7 @@ public class UIDraggableItem : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         canvas = GetComponentInParent<Canvas>();
         playerHand = FindFirstObjectByType<PlayerHand>();
         uiImage = GetComponent<Image>();
+        originalParent = transform.parent;
     }
 
     void OnEnable()
@@ -59,6 +60,9 @@ public class UIDraggableItem : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         uiImage.sprite = data.itemIcon;
         uiImage.enabled = true;
         LinkedPhysicalItem = physicalItem;
+
+        // When we initialize from a pickup, we want to pass a reference of this to the physical item so it can update the UI when dropped or stowed.
+        physicalItem.SetLinkedUIItem(this);
 
         // Reset position inside the Hand UI Slot layout parent
         rectTransform.localPosition = Vector3.zero;
