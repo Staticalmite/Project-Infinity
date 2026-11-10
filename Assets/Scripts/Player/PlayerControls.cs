@@ -35,6 +35,7 @@ public class PlayerControls : MonoBehaviour
         playerActions.Player.Sprint.canceled += ctx => IsSprinting = false;
 
         playerActions.Player.Interact.performed += Handle_Interact;
+        playerActions.Player.HandAction.canceled += Cancel_HandAction;
         playerActions.Player.HandAction.performed += Handle_HandAction;
         playerActions.Player.ToggleInventory.performed += Handle_InventoryToggle;
 
@@ -51,6 +52,11 @@ public class PlayerControls : MonoBehaviour
     private void Handle_HandAction(InputAction.CallbackContext context)
     {
         playerHand.ExecuteHandAction();
+    }
+
+    private void Cancel_HandAction(InputAction.CallbackContext context)
+    {
+        playerHand.ReleaseHandAction();
     }
 
     void OnDestroy()

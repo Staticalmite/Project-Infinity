@@ -19,8 +19,11 @@ public abstract class ActiveItem : MonoBehaviour
 
     // Abstract methods that must be implemented by subclasses, anything using this class must implement these methods.
 
-    // <summary> What happens when the item is used</summary>
+    // <summary> What happens when the button is held down</summary>
     public abstract void OnUseAction();
+
+    // <summary> What happens when the button is released</summary>
+    public abstract void OnReleaseAction();
 
     // <summary> What happens when the item is equipped</summary>
     public abstract void OnEquip();

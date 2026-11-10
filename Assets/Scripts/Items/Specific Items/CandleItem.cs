@@ -15,6 +15,11 @@ public class CandleItem : ActiveItem
         }
     }
 
+    public override void OnReleaseAction()
+    {
+        // No specific action on release for the candle
+    }
+
     void Update()
     {
         if (candleLight != null)

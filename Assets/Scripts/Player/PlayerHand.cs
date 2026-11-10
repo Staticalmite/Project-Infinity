@@ -68,4 +68,12 @@ public class PlayerHand : MonoBehaviour
             CurrentlyHeldItem.OnUseAction();
         }
     }
+
+    public void ReleaseHandAction()
+    {
+        if(IsHandOccupied && (firstPersonController == null || !firstPersonController.InventoryPanel.activeSelf))
+        {
+            CurrentlyHeldItem.OnReleaseAction();
+        }
+    }
 }

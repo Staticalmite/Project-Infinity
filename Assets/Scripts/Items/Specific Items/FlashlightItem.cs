@@ -9,10 +9,15 @@ public class FlashlightItem : ActiveItem
 
     public override void OnUseAction()
     {
+        // Toggle the flashlight's light on and off when the item is used
         if (flashlightLight != null)
         {
             flashlightLight.enabled = !flashlightLight.enabled;
             Debug.Log($"{Data.itemName} toggled!");
         }
+    }
+    public override void OnReleaseAction()
+    {
+        // No specific action on release for the flashlight
     }
 }

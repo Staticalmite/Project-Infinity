@@ -9,6 +9,7 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private float walkSpeed = 5f;
     [SerializeField] private float sprintSpeed = 8f;
     [SerializeField] private float gravity = -9.81f;
+    public float otherSpeedMultiplier = 1f; // This multiplier can be adjusted by other scripts to modify the player's speed - used for slowing player down when they try to throw something.
 
     [Header("Look Settings")]
     [SerializeField] private Camera playerCamera;
@@ -99,7 +100,7 @@ public class FirstPersonController : MonoBehaviour
         }
 
         movement.y = velocity.y;
-        characterController.Move(movement * Time.deltaTime);
+        characterController.Move(movement * otherSpeedMultiplier * Time.deltaTime);
 
         if(movement.x != 0)
         {

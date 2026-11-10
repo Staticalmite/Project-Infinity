@@ -23,9 +23,15 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] private float detectionRange;
     [SerializeField] private float loseSightRange;
 
+    [Header("Chase")]
+    public bool enraged = false;
+
+    private bool isStunned = false;
+
     private LayerMask layerMask;
     private RaycastHit hit;
     private EnemyAudioManager audioManager;
+    private ChaseManager chaseManager;
 
 
     public AudioSource audioSource;
@@ -44,7 +50,7 @@ public class EnemyAI : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         audioManager = FindFirstObjectByType<EnemyAudioManager>();
         animator = GetComponent<Animator>();
-
+        chaseManager = FindFirstObjectByType<ChaseManager>();
 
         layerMask = LayerMask.GetMask("Wall", "Player");
 
@@ -71,20 +77,7 @@ public class EnemyAI : MonoBehaviour
 
     private void UpdateChaseState()
     {
-        // Check for transition back to Patrolling
-        if (player == null || Vector3.Distance(transform.position, player.position) > loseSightRange)
-        {
-            currentState = EnemyState.Patrolling;
-
-            // Resume pathing toward the last known waypoint
-            if (currentWaypoint != null)
-            {
-                agent.SetDestination(currentWaypoint.transform.position);
-            }
-            return;
-        }
-
-        // Standard Chase Logic
+        // Standard Chase Logic, just set destination to the player's position.
         agent.SetDestination(player.position);
     }
 
@@ -93,8 +86,8 @@ public class EnemyAI : MonoBehaviour
     private void UpdatePatrolState()
     {
         Debug.DrawRay(transform.position, (firstPersonController.transform.position - transform.position).normalized * detectionRange, Color.blue, 0.1f);
-        // Check for transition to Chasing - if the player is making noise and in sight, switch to Chasing.
-        if (firstPersonController != null && firstPersonController.makingNoise && Physics.Raycast(transform.position, player.position - transform.position, out hit, detectionRange, layerMask))
+        // Check for transition to Chasing - if the player is making noise and in sight, switch to Chasing. Unlesss
+        if (firstPersonController != null && firstPersonController.makingNoise && Physics.Raycast(transform.position, player.position - transform.position, out hit, detectionRange, layerMask) && !isStunned)
         {
             if(hit.collider.CompareTag("Player"))
             {
@@ -146,6 +139,14 @@ public class EnemyAI : MonoBehaviour
 
     public void Stun(float stunDuration)
     {
+        // If the enemy is stunned when enraged, we need to stop the chase.
+        if(enraged)
+        {
+            enraged = false;
+            animator.SetTrigger("ResetToPatrol");
+            animator.ResetTrigger("ResetToPatrol");
+            agent.speed = 1;
+        }
         // Handle logic for being stunned by the player, including for a normal stun and a counter stun.
         // This should include stopping the enemy, playing a stunned animation, and then resuming the previous state after a delay.
         agent.isStopped = true;
@@ -181,6 +182,7 @@ public class EnemyAI : MonoBehaviour
         agent.isStopped = false;
         agent.speed = 4;
         audioManager.PlayChaseAudio();
+        chaseManager.StartChase(this);
     }
 
     // Coroutine to handle the delay before starting the chase after being stunned
@@ -207,6 +209,8 @@ public class EnemyAI : MonoBehaviour
         // Only play the chase audio if we're not already chasing, to avoid overlapping audio.
         if (currentState != EnemyState.Chasing)
             audioManager.PlayChaseAudio();
+        if(currentState != EnemyState.Chasing)
+            chaseManager.StartChase(this);
         currentState = EnemyState.Chasing;
     }
 }
