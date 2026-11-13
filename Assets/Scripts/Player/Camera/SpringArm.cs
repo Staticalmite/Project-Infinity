@@ -12,7 +12,7 @@ public class SpringArm : MonoBehaviour
     [Space]
     public Transform target;
     public float movementSmoothTime = 0.05f;
-    public float rotationSmoothTime = 0.05f; // Controls the "sway" / lag when the target turns
+    public float rotationSmoothTime = 0.05f;
     public float targetArmLength = 3f;
     public Vector3 socketOffset;
     public Vector3 targetOffset;
@@ -47,12 +47,12 @@ public class SpringArm : MonoBehaviour
     private readonly Color collisionProbeColor = new Color(0.2f, 0.75f, 0.2f, 0.15f);
 
     private Vector3 moveVelocity;
-    private Vector3 collisionTestVelocity;
+    private Vector3 socketMoveVelocity; // Used for smoothing the socket position itself
     private Quaternion rotationVelocity; // For smooth rotation damping
 
     #endregion
 
-    private void Start()
+    private void Awake()
     {
         raycastPositions = new Vector3[collisionTestResolution];
         hits = new RaycastHit[collisionTestResolution];
@@ -69,11 +69,13 @@ public class SpringArm : MonoBehaviour
         if (!target)
             return;
 
-        // Smoothly follow the target's world position plus offset
+        // Calculate target world position and rotation base
         Vector3 targetWorldPosition = target.position + targetOffset;
-        transform.position = Vector3.SmoothDamp(transform.position, targetWorldPosition, ref moveVelocity, movementSmoothTime);
 
-        // Smoothly follow the target's rotation (adds a natural sway/lag effect)
+        // If this object is the socket, we want to calculate where the arm extends TO from the target.
+        // Let's smooth-damp the base position tracking the target first:
+        // (Alternatively, if this object is directly at the target, we offset from it).
+
         if (rotationSmoothTime > 0f && Application.isPlaying)
         {
             transform.rotation = SmoothDampQuaternion(transform.rotation, target.rotation, ref rotationVelocity, rotationSmoothTime);
@@ -83,26 +85,28 @@ public class SpringArm : MonoBehaviour
             transform.rotation = target.rotation;
         }
 
-        // Collision check
+        // Collision check & socket calculation
         if (doCollisionTest)
-            CheckCollisions();
+            CheckCollisions(targetWorldPosition);
 
-        // Set the socket position for the camera child
-        SetSocketTransform();
+        // Move THIS object (the socket) to the final calculated socket position smoothly
+        transform.position = Vector3.SmoothDamp(transform.position, socketPosition, ref socketMoveVelocity, collisionSmoothTime);
     }
 
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()
     {
-        if (!visualDebugging)
+        if (!visualDebugging || !target)
             return;
+
+        Vector3 basePos = target.position + targetOffset;
 
         Handles.color = springArmColor;
         if (showRaycasts)
             foreach (Vector3 raycastPosition in raycastPositions)
-                Handles.DrawAAPolyLine(springArmLineWidth, 2, transform.position, raycastPosition);
+                Handles.DrawAAPolyLine(springArmLineWidth, 2, basePos, raycastPosition);
         else
-            Handles.DrawAAPolyLine(springArmLineWidth, 2, transform.position, endPoint);
+            Handles.DrawAAPolyLine(springArmLineWidth, 2, basePos, endPoint);
 
         Handles.color = collisionProbeColor;
         if (showCollisionProbe)
@@ -110,24 +114,20 @@ public class SpringArm : MonoBehaviour
     }
 #endif
 
-    private void CheckCollisions()
+    private void CheckCollisions(Vector3 basePosition)
     {
         Transform trans = transform;
-                        
+        Quaternion currentRot = trans.rotation;
+
+        Vector3 targetArmOffset = socketOffset - new Vector3(0, 0, targetArmLength);
+        endPoint = basePosition + (currentRot * targetArmOffset);
+
         for (int i = 0, angle = 0; i < collisionTestResolution; i++, angle += 360 / collisionTestResolution)
         {
             Vector3 raycastLocalEndPoint = new Vector3(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad), 0) * collisionProbeSize;
-            raycastPositions[i] = endPoint + (trans.rotation * raycastLocalEndPoint);
-            Physics.Linecast(trans.position, raycastPositions[i], out hits[i], collisionLayerMask);
+            raycastPositions[i] = endPoint + (currentRot * raycastLocalEndPoint);
+            Physics.Linecast(basePosition, raycastPositions[i], out hits[i], collisionLayerMask);
         }
-    }
-
-    private void SetSocketTransform()
-    {
-        Transform trans = transform;
-
-        Vector3 targetArmOffset = socketOffset - new Vector3(0, 0, targetArmLength);
-        endPoint = trans.position + (trans.rotation * targetArmOffset);
 
         if (doCollisionTest)
         {
@@ -137,14 +137,14 @@ public class SpringArm : MonoBehaviour
                 if (!hit.collider)
                     continue;
 
-                float distance = Vector3.Distance(hit.point, trans.position);
+                float distance = Vector3.Distance(hit.point, basePosition);
                 if (minDistance > distance)
                 {
                     minDistance = distance;
                 }
             }
 
-            Vector3 dir = (endPoint - trans.position).normalized;
+            Vector3 dir = (endPoint - basePosition).normalized;
             Vector3 armOffset = dir * (targetArmLength - minDistance);
             socketPosition = endPoint - armOffset;
         }
@@ -152,19 +152,13 @@ public class SpringArm : MonoBehaviour
         {
             socketPosition = endPoint;
         }
-
-        foreach (Transform child in trans)
-        {
-            child.position = Vector3.SmoothDamp(child.position, socketPosition, ref collisionTestVelocity, collisionSmoothTime);
-        }
     }
 
-    // Helper method to smoothly damp quaternions (since Vector3.SmoothDamp doesn't work on rotations)
+    // Helper method to smoothly damp quaternions
     private static Quaternion SmoothDampQuaternion(Quaternion rot, Quaternion target, ref Quaternion deriv, float time)
     {
         if (Time.deltaTime < Mathf.Epsilon) return rot;
 
-        // Account for double covering
         if (Quaternion.Dot(rot, target) < 0f)
         {
             target.x = -target.x;
@@ -173,7 +167,6 @@ public class SpringArm : MonoBehaviour
             target.w = -target.w;
         }
 
-        // Smooth damp each component
         Vector4 result = new Vector4(
             Mathf.SmoothDamp(rot.x, target.x, ref deriv.x, time),
             Mathf.SmoothDamp(rot.y, target.y, ref deriv.y, time),

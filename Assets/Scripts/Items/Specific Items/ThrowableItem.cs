@@ -21,11 +21,16 @@ public class ThrowableItem : ActiveItem
     // UI Elements
     private Image holdTimerImage;
 
+    private Vector3 originalLocalPosition;
+
     private void Start()
     {
         firstPersonController = FindFirstObjectByType<FirstPersonController>();
         playerHand = FindFirstObjectByType<PlayerHand>();
         holdTimerImage = GameObject.FindGameObjectWithTag("Hold Timer Image").GetComponent<Image>();
+
+        // Cache the base position of the item in the hand
+        originalLocalPosition = transform.localPosition;
     }
 
 
@@ -48,8 +53,12 @@ public class ThrowableItem : ActiveItem
 
     private void Shake()
     {
-        // Offset the item's position slightly to create a shaking effect.
-        transform.position += new Vector3(Mathf.Sin(Time.time * (holdTimer / shakeSpeed)) * Random.Range(0.001f, 0.02f), Mathf.Sin(Time.time * (holdTimer / shakeSpeed)) * Random.Range(0.001f, 0.02f), 0);
+        // Calculate a small offset based on the hold timer and shake speed to create a shaking effect.
+        float offsetX = Mathf.Sin(Time.time * (holdTimer / shakeSpeed)) * Random.Range(0.001f, 0.02f);
+        float offsetY = Mathf.Sin(Time.time * (holdTimer / shakeSpeed)) * Random.Range(0.001f, 0.02f);
+
+        // Apply the calculated offset to the item's local position to create the shaking effect.
+        transform.localPosition = originalLocalPosition + new Vector3(offsetX, offsetY, 0f);
 
     }
     public override void OnEquip()
@@ -57,6 +66,9 @@ public class ThrowableItem : ActiveItem
         gameObject.SetActive(true);
         holdTimer = 0f; // Reset the hold timer when the item is equipped.
         holdTimerImage.fillAmount = 0f; // Reset the UI fill amount.
+
+        // Recache the local position when equipped
+        originalLocalPosition = transform.localPosition;
     }
     public override void OnUnequip() => gameObject.SetActive(false);
     public override void OnUseAction()
